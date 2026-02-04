@@ -1,50 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Auth-Viewer | Masjid MKSLB</title>
+    <title>Auth-Viewer | MKSLB 2050</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/otplib/12.0.1/otplib-browser.js"></script>
     <style>
-        body { background: #0a1917; color: #00c853; font-family: sans-serif; text-align: center; padding: 50px; }
-        .auth-card { border: 2px solid #004d40; padding: 20px; border-radius: 15px; margin-bottom: 20px; display: inline-block; width: 300px; }
-        .code { font-size: 3.5rem; letter-spacing: 5px; color: #ffd700; font-weight: bold; }
-        .name { color: white; font-size: 1.2rem; margin-bottom: 10px; }
-        .timer { color: #aaa; margin-top: 10px; font-size: 0.9rem; }
+        body { background: #0a1917; color: #00c853; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px; }
+        .grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .card { border: 2px solid #004d40; padding: 25px; border-radius: 15px; background: #0d2522; width: 320px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .code { font-size: 4rem; color: #ffd700; font-family: monospace; margin: 15px 0; letter-spacing: 5px; }
+        .name { color: white; font-size: 1.1rem; font-weight: bold; border-bottom: 1px solid #004d40; padding-bottom: 10px; }
+        .timer-bar { height: 5px; background: #004d40; margin-top: 15px; border-radius: 3px; overflow: hidden; }
+        .progress { height: 100%; background: #00c853; width: 100%; transition: width 1s linear; }
     </style>
 </head>
 <body>
-    <h1>AUTHENTICATOR PC - BILIK IMAM</h1>
+    <h1 style="color: #00c853;">AUTH-VIEWER PC (OFFLINE MODE)</h1>
+    <p style="color: #aaa;">Salin kod ini ke dalam Kiosk jika anda tidak membawa telefon.</p>
     
-    <div class="auth-card">
-        <div class="name">EN. AIMAN RAFEE</div>
-        <div id="code-aiman" class="code">------</div>
-        <div id="timer-aiman" class="timer">Kemas kini dalam 30s</div>
-    </div>
+    <div class="grid">
+        <div class="card">
+            <div class="name">EN. MUHAMMAD AIMAN</div>
+            <div id="code-aiman" class="code">------</div>
+            <div class="timer-bar"><div id="bar-aiman" class="progress"></div></div>
+        </div>
 
-    <div class="auth-card">
-        <div class="name">EN. FAIZ MUFASSIR</div>
-        <div id="code-faiz" class="code">------</div>
-        <div id="timer-faiz" class="timer">Kemas kini dalam 30s</div>
+        <div class="card">
+            <div class="name">EN. FAIZ MUFASSIR</div>
+            <div id="code-faiz" class="code">------</div>
+            <div class="timer-bar"><div id="bar-faiz" class="progress"></div></div>
+        </div>
     </div>
 
     <script>
         const { totp } = otplib;
-        // Secret Key yang sama dalam GAS
         const secrets = {
             aiman: "AIMAN2050SOLIDMKSLB",
             faiz: "FAIZ2050SOLIDMKSLB"
         };
 
-        function updateCodes() {
-            document.getElementById('code-aiman').innerText = totp.generate(secrets.aiman);
-            document.getElementById('code-faiz').innerText = totp.generate(secrets.faiz);
+        function update() {
+            const aimanCode = totp.generate(secrets.aiman);
+            const faizCode = totp.generate(secrets.faiz);
             
-            const timeLeft = 30 - (Math.floor(Date.now() / 1000) % 30);
-            document.getElementById('timer-aiman').innerText = "Bertukar dalam " + timeLeft + "s";
-            document.getElementById('timer-faiz').innerText = "Bertukar dalam " + timeLeft + "s";
+            document.getElementById('code-aiman').innerText = aimanCode;
+            document.getElementById('code-faiz').innerText = faizCode;
+
+            const epoch = Math.floor(Date.now() / 1000);
+            const progress = ((30 - (epoch % 30)) / 30) * 100;
+            document.getElementById('bar-aiman').style.width = progress + "%";
+            document.getElementById('bar-faiz').style.width = progress + "%";
         }
 
-        setInterval(updateCodes, 1000);
-        updateCodes();
+        setInterval(update, 1000);
+        update();
     </script>
 </body>
 </html>
