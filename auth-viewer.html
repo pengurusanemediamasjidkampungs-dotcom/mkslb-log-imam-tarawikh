@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth-Viewer | Masjid MKSLB</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/otplib/12.0.1/otplib-browser.js"></script>
+    <style>
+        body { background: #0a1917; color: #00c853; font-family: sans-serif; text-align: center; padding: 50px; }
+        .auth-card { border: 2px solid #004d40; padding: 20px; border-radius: 15px; margin-bottom: 20px; display: inline-block; width: 300px; }
+        .code { font-size: 3.5rem; letter-spacing: 5px; color: #ffd700; font-weight: bold; }
+        .name { color: white; font-size: 1.2rem; margin-bottom: 10px; }
+        .timer { color: #aaa; margin-top: 10px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <h1>AUTHENTICATOR PC - BILIK IMAM</h1>
+    
+    <div class="auth-card">
+        <div class="name">EN. AIMAN RAFEE</div>
+        <div id="code-aiman" class="code">------</div>
+        <div id="timer-aiman" class="timer">Kemas kini dalam 30s</div>
+    </div>
+
+    <div class="auth-card">
+        <div class="name">EN. FAIZ MUFASSIR</div>
+        <div id="code-faiz" class="code">------</div>
+        <div id="timer-faiz" class="timer">Kemas kini dalam 30s</div>
+    </div>
+
+    <script>
+        const { totp } = otplib;
+        // Secret Key yang sama dalam GAS
+        const secrets = {
+            aiman: "AIMAN2050SOLIDMKSLB",
+            faiz: "FAIZ2050SOLIDMKSLB"
+        };
+
+        function updateCodes() {
+            document.getElementById('code-aiman').innerText = totp.generate(secrets.aiman);
+            document.getElementById('code-faiz').innerText = totp.generate(secrets.faiz);
+            
+            const timeLeft = 30 - (Math.floor(Date.now() / 1000) % 30);
+            document.getElementById('timer-aiman').innerText = "Bertukar dalam " + timeLeft + "s";
+            document.getElementById('timer-faiz').innerText = "Bertukar dalam " + timeLeft + "s";
+        }
+
+        setInterval(updateCodes, 1000);
+        updateCodes();
+    </script>
+</body>
+</html>
