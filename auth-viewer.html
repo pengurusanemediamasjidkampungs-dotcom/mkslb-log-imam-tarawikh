@@ -1,58 +1,130 @@
 <!DOCTYPE html>
-<html>
+<html lang="ms">
 <head>
+    <meta charset="UTF-8">
     <title>Auth-Viewer | MKSLB 2050</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/otplib/12.0.1/otplib-browser.js"></script>
+    <script src="https://unpkg.com/@otplib/preset-browser@latest/buffer.js"></script>
+    <script src="https://unpkg.com/@otplib/preset-browser@latest/index.js"></script>
     <style>
-        body { background: #0a1917; color: #00c853; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 40px; }
-        .grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-        .card { border: 2px solid #004d40; padding: 25px; border-radius: 15px; background: #0d2522; width: 320px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .code { font-size: 4rem; color: #ffd700; font-family: monospace; margin: 15px 0; letter-spacing: 5px; }
-        .name { color: white; font-size: 1.1rem; font-weight: bold; border-bottom: 1px solid #004d40; padding-bottom: 10px; }
-        .timer-bar { height: 5px; background: #004d40; margin-top: 15px; border-radius: 3px; overflow: hidden; }
-        .progress { height: 100%; background: #00c853; width: 100%; transition: width 1s linear; }
+        body { 
+            background: #0a1917; 
+            color: #00c853; 
+            font-family: 'Segoe UI', sans-serif; 
+            text-align: center; 
+            padding: 40px; 
+            margin: 0;
+        }
+        .grid { 
+            display: flex; 
+            justify-content: center; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+            margin-top: 30px;
+        }
+        .card { 
+            border: 2px solid #004d40; 
+            padding: 25px; 
+            border-radius: 15px; 
+            background: #0d2522; 
+            width: 320px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); 
+            transition: 0.3s;
+        }
+        .card:hover { border-color: #00c853; }
+        .code { 
+            font-size: 4rem; 
+            color: #ffd700; 
+            font-family: 'Courier New', monospace; 
+            margin: 15px 0; 
+            letter-spacing: 8px; 
+            font-weight: bold;
+        }
+        .name { 
+            color: white; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            border-bottom: 1px solid #004d40; 
+            padding-bottom: 10px; 
+            text-transform: uppercase;
+        }
+        .timer-bar { 
+            height: 8px; 
+            background: #1a332f; 
+            margin-top: 20px; 
+            border-radius: 4px; 
+            overflow: hidden; 
+        }
+        .progress { 
+            height: 100%; 
+            background: linear-gradient(90deg, #00c853, #b2ff59); 
+            width: 100%; 
+            transition: width 1s linear; 
+        }
+        .status { font-size: 0.8rem; color: #666; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1 style="color: #00c853;">AUTH-VIEWER PC (OFFLINE MODE)</h1>
-    <p style="color: #aaa;">Salin kod ini ke dalam Kiosk jika anda tidak membawa telefon.</p>
+    <h1 style="color: #00c853; letter-spacing: 2px;">AUTH-VIEWER PC (OFFLINE MODE)</h1>
+    <p style="color: #aaa;">Kod 6-digit ini dijana secara automatik setiap 30 saat.</p>
     
     <div class="grid">
         <div class="card">
             <div class="name">EN. MUHAMMAD AIMAN</div>
             <div id="code-aiman" class="code">------</div>
             <div class="timer-bar"><div id="bar-aiman" class="progress"></div></div>
+            <div class="status">KOD DIKEMASKINI</div>
         </div>
 
         <div class="card">
             <div class="name">EN. FAIZ MUFASSIR</div>
             <div id="code-faiz" class="code">------</div>
             <div class="timer-bar"><div id="bar-faiz" class="progress"></div></div>
+            <div class="status">KOD DIKEMASKINI</div>
         </div>
     </div>
 
     <script>
-        const { totp } = otplib;
-        const secrets = {
-            aiman: "AIMAN2050SOLIDMKSLB",
-            faiz: "FAIZ2050SOLIDMKSLB"
-        };
+        // Tunggu library sedia
+        function startGenerator() {
+            const secrets = {
+                aiman: "AIMAN2050SOLIDMKSLB",
+                faiz: "FAIZ2050SOLIDMKSLB"
+            };
 
-        function update() {
-            const aimanCode = totp.generate(secrets.aiman);
-            const faizCode = totp.generate(secrets.faiz);
-            
-            document.getElementById('code-aiman').innerText = aimanCode;
-            document.getElementById('code-faiz').innerText = faizCode;
+            function updateCodes() {
+                try {
+                    // Penjanaan kod menggunakan otplib browser preset
+                    const aimanCode = window.otplib.totp.generate(secrets.aiman);
+                    const faizCode = window.otplib.totp.generate(secrets.faiz);
+                    
+                    document.getElementById('code-aiman').innerText = aimanCode;
+                    document.getElementById('code-faiz').innerText = faizCode;
 
-            const epoch = Math.floor(Date.now() / 1000);
-            const progress = ((30 - (epoch % 30)) / 30) * 100;
-            document.getElementById('bar-aiman').style.width = progress + "%";
-            document.getElementById('bar-faiz').style.width = progress + "%";
+                    // Logik bar masa (30 saat)
+                    const epoch = Math.floor(Date.now() / 1000);
+                    const secondsRemaining = 30 - (epoch % 30);
+                    const progressPercentage = (secondsRemaining / 30) * 100;
+                    
+                    document.getElementById('bar-aiman').style.width = progressPercentage + "%";
+                    document.getElementById('bar-faiz').style.width = progressPercentage + "%";
+                    
+                } catch (err) {
+                    console.error("Ralat penjanaan kod:", err);
+                }
+            }
+
+            // Kemaskini setiap saat
+            setInterval(updateCodes, 1000);
+            updateCodes();
         }
 
-        setInterval(update, 1000);
-        update();
+        // Semak kehadiran library secara berkala sebelum mula
+        const checkLibrary = setInterval(() => {
+            if (window.otplib) {
+                clearInterval(checkLibrary);
+                startGenerator();
+            }
+        }, 500);
     </script>
 </body>
 </html>
