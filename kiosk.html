@@ -38,7 +38,6 @@
         h1 { color: var(--neon-green); letter-spacing: 2px; margin-bottom: 5px; }
         .mkslb-tag { color: var(--text-gold); font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 3px; }
 
-        /* Grid Nama Imam */
         .imam-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -67,7 +66,6 @@
             box-shadow: 0 5px 15px rgba(0, 200, 83, 0.4);
         }
 
-        /* Ruangan Auth */
         #auth-section {
             display: none;
             animation: fadeIn 0.5s;
@@ -145,7 +143,8 @@
 
     <script>
         let currentImam = "";
-        const gasURL = "TAMPAL_URL_WEB_APP_GAS_ANDA_DI_SINI"; // Masukkan URL yang anda salin dari GAS
+        // URL GAS anda yang telah dikemaskini
+        const gasURL = "https://script.google.com/macros/s/AKfycbxgeuiKsb5KESdyo0gSSbaFLoOKDt_8IcVNZXnpkg_oiE2l7eZF02_0JlmAI_Gw0MhO/exec";
 
         function startAuth(name) {
             currentImam = name;
@@ -153,13 +152,11 @@
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('auth-section').style.display = 'block';
             
-            // Fokus automatik untuk Numpad Fizikal
             setTimeout(() => {
                 document.getElementById('otp-input').focus();
             }, 100);
         }
 
-        // Logik Numpad & Enter
         document.getElementById('otp-input').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const code = this.value;
@@ -178,27 +175,27 @@
             const inputField = document.getElementById('otp-input');
 
             loading.style.display = 'block';
-            statusMsg.innerText = "Mengesahkan Kod...";
+            statusMsg.innerText = "Menghantar Data...";
             inputField.disabled = true;
 
-            // Menghantar data ke Google Apps Script
             fetch(gasURL, {
                 method: 'POST',
-                mode: 'no-cors', // Penting untuk mengelakkan ralat CORS pada GAS
+                mode: 'no-cors', 
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ imam: imam, otp: otp })
             })
             .then(() => {
-                // Kerana 'no-cors', kita anggap berjaya jika tiada ralat network
                 statusMsg.innerText = "LOG BERJAYA DISIMPAN!";
                 statusMsg.style.color = "#00c853";
                 setTimeout(() => {
-                    alert("Alhamdulillah, Log Berjaya. Sila mulakan Ibadah.");
+                    alert("Alhamdulillah, Log Berjaya.");
                     location.reload();
-                }, 1000);
+                }, 1200);
             })
             .catch(err => {
                 console.error("Ralat:", err);
-                statusMsg.innerText = "RALAT SISTEM!";
+                statusMsg.innerText = "RALAT NETWORK!";
                 statusMsg.style.color = "red";
                 inputField.disabled = false;
                 loading.style.display = 'none';
